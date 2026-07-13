@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MPV2 — Automated Cold-Outreach Pipeline · Felix Milgram</title>
-<meta name="description" content="Backend pipeline that sources local-business leads, generates a bespoke website mockup for each one, sends personalized email with the preview, and processes replies. Built by Felix Milgram.">
+<meta name="description" content="Backend pipeline that sources local-business leads, generates a bespoke website mockup for each one from real reviews and photos, then reaches out on the right channel — SMS for mobile numbers, AI voice call for landlines. Replies and call outcomes are classified and looped back. Built by Felix Milgram.">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -259,7 +259,7 @@
     <div class="badge">Production Pipeline · Built &amp; Shipped Solo</div>
     <h1>Cold outreach that <span class="accent">generates a real website</span><br>for every prospect.</h1>
     <p class="lead">
-      MPV2 is an automated backend pipeline: it sources local-business leads from Google Maps, generates a bespoke Tailwind website preview for each one from real reviews and photos, sends the prospect a personalized email with the preview link, and processes their reply — bounce classification, LLM intent detection, sequence pausing, the whole loop.
+      MPV2 is an automated backend pipeline: it sources local-business leads from Google Maps, generates a bespoke Tailwind website preview for each one from real reviews and photos, then reaches out on the right channel — an SMS-capable lookup routes mobile numbers to a personalized text with the preview link, and landlines get an AI voice call from a per-vertical Vapi assistant. Replies, opens, and call outcomes are all classified and looped back into the CRM.
     </p>
     <div class="cta-row">
       <a href="#demo" class="btn btn-primary">
@@ -284,33 +284,33 @@
 <section id="pipeline">
   <div class="wrap">
     <h2><span class="num">01</span>The pipeline</h2>
-    <p class="section-lead">Every stage runs headless, is idempotent, and persists to a single SQLite CRM. No moving parts you can't observe.</p>
+    <p class="section-lead">Every stage runs headless, is idempotent, and persists to a single SQLite CRM. Channel selection happens up front — no wasted texts to landlines, no wasted calls to mobile.</p>
 
     <div class="pipeline">
       <div class="step">
         <div class="n">01 · SOURCE</div>
         <div class="name">Scrape</div>
-        <div class="d">Google Maps scraper CSV → normalized lead rows</div>
+        <div class="d">Google Maps scraper CSV → normalized lead rows in the CRM</div>
       </div>
       <div class="step">
         <div class="n">02 · ENRICH</div>
         <div class="name">Verify</div>
-        <div class="d">Email guessing + MX validation, phone classification, real Google reviews &amp; photos via RapidAPI</div>
+        <div class="d">Telnyx number-lookup marks each phone SMS-capable or landline; RapidAPI pulls real Google reviews &amp; photos</div>
       </div>
       <div class="step">
         <div class="n">03 · GENERATE</div>
         <div class="name">Mockup</div>
-        <div class="d">Per-lead Jinja2 render + Playwright screenshot from vetted Tailwind templates</div>
+        <div class="d">Per-lead Jinja2 render on vetted Tailwind templates + Playwright screenshot, hosted publicly</div>
       </div>
       <div class="step">
-        <div class="n">04 · SEND</div>
-        <div class="name">Deliver</div>
-        <div class="d">SMTP with tracked opens &amp; clicks, per-lead subject &amp; body render</div>
+        <div class="n">04 · REACH OUT</div>
+        <div class="name">Route</div>
+        <div class="d">SMS-capable numbers get a personalized text with the preview link (Telnyx or Android gateway). Landlines get an AI voice call from a per-vertical Vapi assistant.</div>
       </div>
       <div class="step">
-        <div class="n">05 · REPLIES</div>
+        <div class="n">05 · CLOSE THE LOOP</div>
         <div class="name">Classify</div>
-        <div class="d">IMAP fetch + LLM classifier: interested / bounce / auto-reply / spam. Pause sequences, suppress bounces, notify.</div>
+        <div class="d">Inbound SMS + call outcomes are parsed by an LLM classifier: interested / not-interested / bounce / auto-reply. Sequences pause on bounces; the operator gets pinged on hot leads.</div>
       </div>
     </div>
   </div>
@@ -331,7 +331,7 @@
             <li>Real reviews &amp; photos pulled via RapidAPI</li>
             <li>NATE-cert language &amp; local building codes injected</li>
             <li>Sitemap + robots.txt generated</li>
-            <li>Fully hosted, screenshot-embedded in the sent email</li>
+            <li>Preview URL is what MPV2 texts or reads out on the voice call</li>
           </ul>
           <a href="https://outreach.aelise.ai/preview/woodalls-mechanical-belmont-ca-886d0884/" target="_blank" rel="noopener" class="btn btn-primary">
             Open in new tab →
@@ -355,24 +355,24 @@
 
     <div class="features">
       <div class="feat">
-        <h4>Bespoke per-lead, not templated blast</h4>
-        <p>Every mockup uses the target's real business name, city, license number, reviews, hero photo. The prospect sees their own information, not a generic template with a name-swap.</p>
+        <h4>Right channel for the right number</h4>
+        <p>Every phone gets a Telnyx number-lookup up front. SMS-capable numbers are texted with the mockup link and tracked for opens/clicks. Landlines and non-textable numbers get an AI voice call from Vapi that pitches the same preview.</p>
       </div>
       <div class="feat">
         <h4>Reply intelligence, not just sends</h4>
-        <p>Full IMAP loop. RFC 3464 bounce parsing. LLM classifier (interested / bounce / auto-reply / spam). Sequences pause automatically on hard-bounces. Operator gets pinged on hot replies.</p>
+        <p>Inbound SMS replies + Vapi call transcripts run through an LLM classifier (interested / not-interested / bounce / auto-reply / spam). Bounces and STOP words trigger automatic suppression across the channel. Hot leads ping the operator.</p>
       </div>
       <div class="feat">
         <h4>Deliverability discipline</h4>
-        <p>MX-validated addresses only. Landline vs. mobile classification before any SMS. Tracked opens/clicks per lead. Suppression list persisted across campaigns.</p>
+        <p>No blind SMS. No blind calls. Every send is gated on a fresh capability check, a per-channel suppression list, and per-lead tracking. Idempotent so retries don't double-message a prospect.</p>
       </div>
       <div class="feat">
         <h4>Idempotent + observable</h4>
-        <p>Every stage is a rerunnable script. Single SQLite CRM. Migrations versioned (001 → 004+). If a stage crashes at scale, replay only what didn't ship.</p>
+        <p>Every stage is a rerunnable script. Single SQLite CRM. Migrations versioned (001 → 004+). If a stage crashes mid-run, replay only what didn't ship — every claimed outbox row is atomic.</p>
       </div>
       <div class="feat">
-        <h4>Voice follow-up (VAPI)</h4>
-        <p>Prospects who open but don't reply get an AI voice call from a per-vertical Vapi assistant configured against their business — 14 niches covered with locked prompt suites.</p>
+        <h4>Vapi assistants tuned per vertical</h4>
+        <p>14 niches have locked prompt/voice/endpointing configs (Cartesia, Nova-2-conversationalai, LiveKit smart endpointing) with A/B/C pitch variants. The assistant is created per-call, auto-deleted after, and a stale-reaper cleans up leaks.</p>
       </div>
       <div class="feat">
         <h4>Extracted from a larger system</h4>
@@ -393,10 +393,12 @@
       <span class="chip">Jinja2</span>
       <span class="chip">Playwright</span>
       <span class="chip">Tailwind CSS</span>
-      <span class="chip">smtplib</span>
-      <span class="chip">imaplib</span>
+      <span class="chip">Telnyx (SMS + lookup)</span>
+      <span class="chip">Vapi.ai (voice)</span>
+      <span class="chip">Cartesia + Deepgram Nova-2</span>
+      <span class="chip">LiveKit endpointing</span>
       <span class="chip">RapidAPI Local Business Data</span>
-      <span class="chip">Vapi.ai</span>
+      <span class="chip">Android SMS gateway</span>
       <span class="chip">LM Studio</span>
       <span class="chip">Docker</span>
       <span class="chip">Cloudflare Pages</span>
